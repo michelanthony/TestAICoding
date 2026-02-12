@@ -1,0 +1,54 @@
+name: Build artifacts
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Run C++ comparison test
+        shell: bash
+        run: |
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            ./build/Release/test_monod_cpp_main.exe
+          else
+            ./build/test_monod_cpp_main
+          fi
+
+      - name: Upload Linux artifact
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: monod-build-linux
+          path: |
+            build/test_monod_cpp_main
+            build/libmonod_model.a
+
+      - name: Upload Windows artifact
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: monod-build-windows
+          path: |
+            build/Release/test_monod_cpp_main.exe
+            build/Release/monod_model.lib
