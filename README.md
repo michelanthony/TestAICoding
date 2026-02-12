@@ -2,6 +2,8 @@
 
 This repository contains an implementation of the Monod bioreaction model in Python and C++11, with a pybind11 interface to call the C++ core from Python.
 
+Repository URL: `https://github.com/michelanthony/TestAICoding.git`
+
 ## Folder structure
 
 - `monod_bioreaction.py`
@@ -95,6 +97,8 @@ The workflow also runs the C++ numeric comparison test before uploading artifact
 Use these commands after local validation:
 
 ```bash
+git clone https://github.com/michelanthony/TestAICoding.git
+cd TestAICoding
 git add .
 git commit -m "your change summary"
 git push origin <your-branch>
