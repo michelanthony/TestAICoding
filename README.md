@@ -4,8 +4,7 @@ This repository contains an implementation of the Monod bioreaction model in Pyt
 
 Repository URL: `https://github.com/michelanthony/TestAICoding.git`
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]
-(https://github.com/michelanthony/TestAICoding/blob/main/notebooks/monod_colab_tutorial.ipynb).
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/michelanthony/TestAICoding/blob/main/notebooks/monod_colab_tutorial.ipynb)
 
 ## Folder structure
 
