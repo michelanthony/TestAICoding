@@ -5,7 +5,7 @@ This repository contains an implementation of the Monod bioreaction model in Pyt
 ## Folder structure
 
 - `monod_bioreaction.py`
-  Main Python script: Monod equations, Euler integration in Python, fallback when the C++ module is not available, and curve plotting.
+  Main Python script: Monod equations, Euler integration in Python, fallback when the C++ module is not available, and tabulated output generation.
 
 - `monod_model.hpp` / `monod_model.cpp`
   C++11 model core (`dX_dt`, `dS_dt`, `integrate`, and `SimulationResult`).
@@ -17,10 +17,13 @@ This repository contains an implementation of the Monod bioreaction model in Pyt
   Build files to compile the pybind11 extension (`monod_cpp`) with C++11.
 
 - `test_monod_cpp_main.cpp`
-  Standalone C++ test (`main`) that compares C++ results with Python reference values.
+  Standalone C++ test (`main`) that compares C++ results with Python reference values and writes a tabulated file.
 
 - `generate_python_reference.py`
   Utility script to regenerate Python reference values used by the C++ test.
+
+- `notebooks/monod_colab_tutorial.ipynb`
+  Google Colab tutorial notebook that generates plots with Matplotlib and saves them into `results/`.
 
 ## Run and test
 
@@ -35,8 +38,7 @@ The executable:
 
 - prints a detailed comparison table in the terminal,
 - creates a `results` folder,
-- writes `results/monod_test_results.csv` with numeric values,
-- writes `results/monod_test_plot.svg` with overlay plots (Python reference vs C++),
+- writes `results/monod_test_results.tsv` with numeric values,
 - and returns success if vectors `time`, `biomass`, and `substrate` match the Python reference.
 
 ### 2) Build pybind11 extension
@@ -47,56 +49,30 @@ pip install -e .
 
 Requires `pybind11`, `setuptools`, and a C++11 compiler.
 
-### 3) Run Python simulation
+### 3) Run Python simulation (tabulated output)
 
 ```bash
 python monod_bioreaction.py
 ```
 
 The script uses `monod_cpp` when available, otherwise it uses the pure Python implementation.
+It writes `results/monod_python_results.tsv`.
+The base script does not require NumPy for execution.
 
-## Curve comparison (Python vs C++)
+## Google Colab tutorial
 
-The snippet below overlays curves from Python integration and C++ integration:
+A Colab-ready tutorial notebook is available at:
 
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-import monod_bioreaction as m
+- `notebooks/monod_colab_tutorial.ipynb`
 
-X0, S0, t_max, dt = 0.1, 1.0, 10.0, 0.1
+What it includes:
 
-t_py, x_py, s_py = m.integrate(X0, S0, t_max, dt)
+- install and setup steps for Colab,
+- Python and pybind11 simulation calls,
+- tabulated output generation in `results/monod_notebook_comparison.tsv`,
+- Matplotlib plot generation in `results/monod_notebook_plot.png`.
 
-if m.monod_cpp is None:
-    raise RuntimeError("monod_cpp module is not available. Run `pip install -e .`.")
-
-t_cpp, x_cpp, s_cpp = m.integrate_with_pybind11(X0, S0, t_max, dt)
-
-plt.figure(figsize=(12, 5))
-
-plt.subplot(1, 2, 1)
-plt.plot(t_py, x_py, label="Biomass Python", linestyle="--")
-plt.plot(t_cpp, x_cpp, label="Biomass C++", alpha=0.8)
-plt.xlabel("Time (h)")
-plt.ylabel("Concentration (g/L)")
-plt.title("Biomass comparison")
-plt.legend()
-
-plt.subplot(1, 2, 2)
-plt.plot(t_py, s_py, label="Substrate Python", linestyle="--")
-plt.plot(t_cpp, s_cpp, label="Substrate C++", alpha=0.8)
-plt.xlabel("Time (h)")
-plt.ylabel("Concentration (g/L)")
-plt.title("Substrate comparison")
-plt.legend()
-
-plt.tight_layout()
-plt.show()
-```
-
-If implementations are consistent, Python and C++ curves overlap.
-
+The notebook is the place where plots are generated and added to the `results` folder.
 
 ## CI/CD build artifacts (Linux and Windows)
 

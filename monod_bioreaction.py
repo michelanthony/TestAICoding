@@ -1,5 +1,5 @@
-import numpy as np
-import matplotlib.pyplot as plt
+import csv
+import os
 
 # Monod kinetics parameters
 # S: substrate concentration, X: biomass concentration
@@ -26,15 +26,28 @@ def dS_dt(X, S):
 
 # Numerical integration using the Euler method
 def integrate(X0, S0, t_max, dt):
-    time_points = np.arange(0, t_max, dt)
-    X = np.zeros(len(time_points))
-    S = np.zeros(len(time_points))
-    X[0] = X0
-    S[0] = S0
+    if dt <= 0:
+        raise ValueError("dt must be > 0")
 
-    for i in range(1, len(time_points)):
-        X[i] = X[i - 1] + dt * dX_dt(X[i - 1], S[i - 1])
-        S[i] = S[i - 1] + dt * dS_dt(X[i - 1], S[i - 1])
+    time_points = []
+    X = []
+    S = []
+
+    t = 0.0
+    x_val = float(X0)
+    s_val = float(S0)
+
+    while t < t_max:
+        time_points.append(t)
+        X.append(x_val)
+        S.append(s_val)
+
+        x_next = x_val + dt * dX_dt(x_val, s_val)
+        s_next = s_val + dt * dS_dt(x_val, s_val)
+
+        t += dt
+        x_val = x_next
+        s_val = s_next
 
     return time_points, X, S
 
@@ -46,27 +59,16 @@ def integrate_with_pybind11(X0, S0, t_max, dt):
         )
 
     time_points, X, S = monod_cpp.integrate(X0, S0, t_max, dt)
-    return np.array(time_points), np.array(X), np.array(S)
+    return list(time_points), list(X), list(S)
 
 
-def plot_results(time_points, X, S):
-    plt.figure(figsize=(12, 5))
-    plt.subplot(1, 2, 1)
-    plt.plot(time_points, X, label="Biomass Concentration (X)")
-    plt.xlabel("Time (hours)")
-    plt.ylabel("Concentration (g/L)")
-    plt.title("Biomass Growth Over Time")
-    plt.legend()
-
-    plt.subplot(1, 2, 2)
-    plt.plot(time_points, S, label="Substrate Concentration (S)", color="orange")
-    plt.xlabel("Time (hours)")
-    plt.ylabel("Concentration (g/L)")
-    plt.title("Substrate Depletion Over Time")
-    plt.legend()
-
-    plt.tight_layout()
-    plt.show()
+def write_tsv(path, time_points, X, S):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", newline="") as f:
+        writer = csv.writer(f, delimiter="\t")
+        writer.writerow(["step", "time", "x", "s"])
+        for i, (t, x_val, s_val) in enumerate(zip(time_points, X, S)):
+            writer.writerow([i, float(t), float(x_val), float(s_val)])
 
 
 if __name__ == "__main__":
@@ -83,4 +85,6 @@ if __name__ == "__main__":
     else:
         time_points, X, S = integrate(X0, S0, t_max, dt)
 
-    plot_results(time_points, X, S)
+    output_path = "results/monod_python_results.tsv"
+    write_tsv(output_path, time_points, X, S)
+    print("Generated table file:", output_path)
