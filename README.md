@@ -91,6 +91,23 @@ plt.show()
 
 If implementations are consistent, Python and C++ curves overlap.
 
+
+## CI/CD build artifacts (Linux and Windows)
+
+GitHub Actions workflow `.github/workflows/build-artifacts.yml` builds the C++11 target on Linux and Windows.
+
+It generates two artifacts:
+
+- `monod-build-linux`
+  - `test_monod_cpp_main`
+  - `libmonod_model.a`
+
+- `monod-build-windows`
+  - `test_monod_cpp_main.exe`
+  - `monod_model.lib`
+
+The workflow also runs the C++ numeric comparison test before uploading artifacts.
+
 ## GitHub pull request
 
 Use these commands after local validation:
