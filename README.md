@@ -31,7 +31,13 @@ g++ -std=c++11 -Wall -Wextra -pedantic monod_model.cpp test_monod_cpp_main.cpp -
 ./test_monod_cpp_main
 ```
 
-The executable prints a success message if vectors `time`, `biomass`, and `substrate` match the Python reference.
+The executable:
+
+- prints a detailed comparison table in the terminal,
+- creates a `results` folder,
+- writes `results/monod_test_results.csv` with numeric values,
+- writes `results/monod_test_plot.svg` with overlay plots (Python reference vs C++),
+- and returns success if vectors `time`, `biomass`, and `substrate` match the Python reference.
 
 ### 2) Build pybind11 extension
 
