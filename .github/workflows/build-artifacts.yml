@@ -52,3 +52,33 @@ jobs:
           path: |
             build/Release/test_monod_cpp_main.exe
             build/Release/monod_model.lib
+
+  build-rocky9:
+    name: Build on rocky9
+    runs-on: ubuntu-latest
+    container:
+      image: rockylinux:9
+
+    steps:
+      - name: Install build dependencies
+        run: dnf install -y cmake gcc-c++ make
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Run C++ comparison test
+        run: ./build/test_monod_cpp_main
+
+      - name: Upload Rocky Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: monod-build-rocky9
+          path: |
+            build/test_monod_cpp_main
+            build/libmonod_model.a
