@@ -20,6 +20,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libeigen3-dev
+
       - name: Configure CMake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
@@ -61,7 +67,7 @@ jobs:
 
     steps:
       - name: Install build dependencies
-        run: dnf install -y cmake gcc-c++ make
+        run: dnf install -y cmake gcc-c++ make eigen3-devel
 
       - name: Checkout repository
         uses: actions/checkout@v4
