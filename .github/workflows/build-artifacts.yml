@@ -67,7 +67,7 @@ jobs:
 
     steps:
       - name: Install build dependencies
-        run: dnf install -y cmake gcc-c++ make eigen3-devel
+        run: dnf install -y cmake gcc-c++ make eigen-devel
 
       - name: Checkout repository
         uses: actions/checkout@v4
